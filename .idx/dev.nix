@@ -5,7 +5,7 @@
   # We only need Node.js (which includes npm) and Git directly from Nix.
   # clasp will be installed via npm in the onCreate hook based on user choice.
   packages = [
-    pkgs.nodejs # Provides node and npm
+    # pkgs.nodejs # Provides node and npm
     pkgs.gitMinimal
   ];
 
@@ -32,10 +32,6 @@
         # Conditionally install clasp based on the 'useAlphaClasp' template parameter.
         install-clasp = ''
           echo "Setting up clasp..."
-          # Ensure the target directory exists before installing
-          mkdir -p "$HOME/.npm-global/bin"
-          # Temporarily add the target bin to the PATH for this script's execution context
-          export PATH="$HOME/.npm-global/bin:$PATH"
 
           if [ "$IDX_PARAM_USEALPHACLASP" = "true" ]; then
             echo "Installing @google/clasp@alpha..."
@@ -43,7 +39,7 @@
             npm install -g --prefix "$HOME/.npm-global" @google/clasp@alpha
           else
             echo "Installing latest stable @google/clasp..."
-            npm install -g --prefix "$HOME/.npm-global" @google/clasp
+            npm install -g @google/clasp
           fi
 
           echo "clasp installation complete. Verifying..."
