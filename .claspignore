@@ -1,0 +1,18 @@
+# Ignore files specifically for clasp push
+
+# Git stuff
+.git/
+.gitignore
+
+# Node development stuff
+node_modules/
+package.json
+package-lock.json
+
+# IDX/VSCode specific
+.idx/
+.vscode/
+
+# Documentation / OS files
+README.md
+.DS_Store
