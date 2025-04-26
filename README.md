@@ -7,56 +7,75 @@
 
 # Google Apps Script Project Template
 
-This template provides a basic structure for developing Google Apps Script projects locally using `clasp` within Google IDX / Firebase Studio.
+This template provides a basic structure for developing Google Apps Script projects locally using `clasp` within Google IDX / Firebase Studio. It uses a Factory Function pattern for manager modules and modern JavaScript (V8 runtime).
 
-During workspace creation, `clasp` (either the latest stable or alpha version, based on your selection) was automatically installed using `npm`.
+**➡️ For initial one-time setup instructions (logging in, linking project), please see `SETUP.md`.**
 
-## Prerequisites
+## Project Overview
 
-*   A Google Account.
-*   Enable the Google Apps Script API in your Google Cloud Platform project: [https://console.developers.google.com/apis/library/script.googleapis.com](https://console.developers.google.com/apis/library/script.googleapis.com)
+- **Goal:** (Describe the main purpose of _this specific_ Apps Script project, e.g., "Automate weekly report generation", "Provide a web interface for managing user data in a Sheet", "Implement a custom function for Google Sheets").
+- **Key Features:** (List major functionalities).
+- **Technology:** Google Apps Script (V8), Clasp, potentially HTML/CSS/Client-JS for web apps.
 
-## Getting Started
+## Development Workflow
 
-1.  **Log in to clasp:**
-    *   The necessary version of `clasp` should already be installed. Open the IDX terminal (Ctrl+` or Cmd+`).
-    *   Run the command: `clasp login`
-    *   Follow the prompts to authorize `clasp` with your Google Account. You only need to do this once per workspace/account.
+_(Assumes you have completed the one-time steps in `SETUP.md`)_
 
-2.  **Choose Your Path:**
+1.  **Edit Code:**
 
-    *   **A) Create a NEW Standalone Apps Script Project:**
-        *   Run: `clasp create --title "Your Project Title Here" --rootDir ./`
-        *   *(Optional: If you provided a Project Title parameter during setup, you could use that here)*.
-        *   This creates a new script project on Google Drive and links it to this local directory (creates `.clasp.json`).
+    - All Apps Script server-side code resides in the `gas/` directory.
+    - Modify existing `.js` files (e.g., `webapp.js`, files in `managers/`) or create new ones within `gas/`.
+    - If building a web app, edit `gas/index.html` and related client-side CSS/JS.
+    - Update the manifest `gas/appsscript.json` as needed (e.g., add OAuth scopes, configure web app).
+    - **Crucially:** If your project requires configuration (API keys, specific IDs, emails), create/update the **`gas/config.js`** file (which is **gitignored**). This file is manually managed. _The AI assistant cannot see the contents of `config.js`._
 
-    *   **B) Link to an EXISTING Apps Script Project:**
-        *   Find the **Script ID** of your existing project (from the script editor URL).
-        *   Run: `clasp pull <SCRIPT_ID> --rootDir ./`
-        *   This pulls the existing code, potentially overwriting local files, and creates `.clasp.json`.
+2.  **Push Changes to Google:**
 
-3.  **Develop Locally:**
-    *   Edit `.gs`/`.js` files and `appsscript.json`.
-    *   Refer to the [Apps Script documentation](https://developers.google.com/apps-script).
+    - Open the IDX terminal.
+    - From the project root directory, run:
+      ```bash
+      clasp push
+      ```
+    - This command uploads the contents of your local `gas/` directory (respecting `.claspignore`) to the linked Apps Script project online.
+    - If you encounter conflicts (e.g., changes made directly in the online editor), `clasp` might prompt you. Use `clasp push -f` to force overwrite the online version with your local version (use with caution).
 
-4.  **Push Changes:**
-    *   Upload local changes: `clasp push`
-    *   Use `clasp push -f` to force overwrite if needed (use with caution).
+3.  **Test Your Changes:**
 
-5.  **Test:**
-    *   Open in the online editor: `clasp open`
+    - **Run Functions:** Open the script in the online editor (`clasp open`), select a function from the dropdown, and click "Run". Check `View > Logs` or `View > Executions` for output and errors.
+    - **Test Web App (if applicable):** Deploy your web app (or use the test deployment URL). Access the URL in your browser. Use browser developer tools (Console, Network tabs) and GAS logs for debugging. The `gas/index.html` in this template often serves as a test harness.
+    - **Test Triggers:** Set up time-driven or event-driven triggers in the online editor (`Triggers` section) and monitor their executions.
 
-## Included Files
+4.  **Version Control (Git):**
+    - Regularly commit your changes:
+      ```bash
+      git add .
+      git commit -m "Your descriptive commit message"
+      git push
+      ```
+    - Use branches (`git checkout -b feature/new-thing`) for new features or fixes.
 
-*   `.idx/dev.nix`: Configures the IDX environment (installs `node`, sets up `npm` globals, installs chosen `clasp` version).
-*   `appsscript.json`: The Apps Script project manifest. **Remember to set your `timeZone`!**
-*   `Code.gs`: Default script file.
-*   `.claspignore`: Specifies files for `clasp` to ignore.
-*   `.gitignore`: Specifies files for `git` to ignore (includes `.clasp.json`).
-*   `README.md`: This file.
+## Project Structure Overview
 
-## Next Steps
+- **`README.md`**: (This file) Project overview, development workflow, structure.
+- **`SETUP.md`**: One-time setup instructions.
+- **`.idx/`**: IDX configuration.
+  - `dev.nix`: Nix environment setup (installs `clasp`, `go-task`, etc.).
+  - `airules.md`: Rules and context for the IDX AI assistant.
+- **`.vscode/`**: (Optional) VS Code settings for the workspace.
+- **`gas/`**: **Contains all code pushed to Apps Script.**
+  - `appsscript.json`: The project manifest (scopes, runtime, web app settings). **Crucial.**
+  - `webapp.js`: (If web app) Handles `doGet` and dispatches UI actions.
+  - `index.html`: (If web app) Main UI file.
+  - `managers/`: Contains modular `.js` files using Factory Functions for specific tasks (e.g., `gasSheetManager.js`, `gasErrorManager.js`).
+  - `config.js`: **Manually created, gitignored.** Holds project-specific configuration.
+  - _(Other `.js`, `.html` files as needed)_
+- **`.gitignore`**: Tells Git which files to ignore (includes `.clasp.json`, `gas/config.js`).
+- **`.claspignore`**: (Optional) Tells `clasp` which files within `gas/` _not_ to push.
+- **`Taskfile.yaml`**: Defines automation tasks using Go Task (e.g., `task ai`, `task dev:branch`).
 
-*   Customize `appsscript.json` (scopes, libraries, add-on settings).
-*   Write your Apps Script code.
-*   Consider adding linting/formatting (ESLint, Prettier) via `package.json` (`npm install`).
+## Next Steps / Further Development
+
+- Customize `gas/appsscript.json` with the correct `timeZone` and necessary `oauthScopes`.
+- Implement the core logic of your script in the `.js` files within `gas/`.
+- Flesh out the `gas/config.js` file with your project's specific settings.
+- (Optional) Set up linters/formatters like ESLint and Prettier (requires adding `package.json` and running `npm install`).

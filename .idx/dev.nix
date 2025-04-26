@@ -5,6 +5,9 @@
   packages = [
     pkgs.google-clasp
     pkgs.go-task
+    # Consider explicitly adding:
+    # pkgs.nodejs
+    # pkgs.gitMinimal
   ];
 
   # Configure environment
@@ -21,8 +24,8 @@
 
     workspace = {
       onCreate = {
-        # Guide the user on the next step
-        setup-reminder = "echo 'Workspace created. Remember to run \"clasp login\". See README.md for details.' && code README.md";
+        # Guide the user to the SETUP file first
+        setup-reminder = "echo 'Workspace created. Please follow the instructions in SETUP.md first.' && code SETUP.md";
       };
 
       # Runs every time the workspace starts
