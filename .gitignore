@@ -4,13 +4,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# clasp credentials (VERY IMPORTANT!)
+# clasp configuration
 .clasp.json
 
-# IDE / Editor directories
-.vscode/
-.idx/
+# IDE / Editor directories (uncomment to exlude them from git)
+# .vscode/
+# .idx/
 
 # OS generated files
 .DS_Store
 Thumbs.db
+
+gas/config.js
+ai_context.txt

@@ -4,9 +4,10 @@
 
   packages = [
     pkgs.google-clasp
+    pkgs.go-task
   ];
 
-  # Configure environment for globally installed npm packages
+  # Configure environment
   env = { };
 
   # IDX specific settings
@@ -19,13 +20,13 @@
     previews = { enable = false; };
 
     workspace = {
-     onCreate = {
-        # Optional: Guide the user on the next step
+      onCreate = {
+        # Guide the user on the next step
         setup-reminder = "echo 'Workspace created. Remember to run \"clasp login\". See README.md for details.' && code README.md";
       };
 
       # Runs every time the workspace starts
-      onStart = {};
+      onStart = { };
     };
   };
 }

@@ -1,0 +1,10 @@
+**/**
+!appsscript.json
+!config.js
+!scratchpad.js
+!managers/*.js
+!webapp.js
+!index.html
+!main.js
+!cleanup.js
+!emailTemplates/*.html

@@ -1,0 +1,183 @@
+# ./Taskfile.yaml
+version: '3'
+
+vars:
+  # AI Task Variables
+  AI_OUTPUT_FILE: ai_context.txt
+  # Regex to include relevant file types for Apps Script/Clasp projects
+  # Includes: .js, .html (GAS UI/client-side), .json (appsscript.json, data),
+  # .sh (helper scripts), .md (docs), .gitignore, .nix (env), Taskfile itself
+  INCLUDE_EXTENSIONS_REGEX: '\.(js|html|json|sh|md|gitignore|nix)$|^(Taskfile\.yaml)$'
+  MAX_FILE_SIZE_KB: 500
+  # Regex to exclude common noise, build artifacts, and sensitive files.
+  # CRITICAL: Excludes .clasp.json which contains auth tokens.
+  # Also excludes common ignores like .git, node_modules, editor config, output file itself.
+  EXCLUDE_PATHS_REGEX: '(^\.git/|^\.clasp\.json$|^node_modules/|^__pycache__/|^\.DS_Store|^\.vscode/|ai_context\.txt)'
+
+tasks:
+  # --- Development Workflow Task ---
+  dev:branch:
+    summary: "Checks out a new 'dev-{YYYY-MM-DD}' branch based on the current date."
+    desc: "Checks out/creates the daily dev branch (dev-YYYY-MM-DD)."
+    preconditions:
+      - sh: "[ -d .git ]"
+        msg: "Not a Git repository. Cannot create a branch."
+      - sh: "command -v git"
+        msg: "'git' command not found."
+      - sh: "command -v date"
+        msg: "'date' command not found."
+      - sh: "git diff --quiet --exit-code && git diff --cached --quiet --exit-code"
+        msg: |
+          You have uncommitted changes. Please use standard Git commands to clean your working directory before switching branches:
+            - To save changes temporarily: git stash
+            - To commit changes:       git add . && git commit -m "Your message"
+            - To discard changes:      git reset --hard HEAD (Warning: Irreversible!)
+    cmds:
+      - |
+        set -e
+        BRANCH_NAME="dev-$(date +%Y-%m-%d)"
+        echo "Attempting to switch to or create branch: $BRANCH_NAME..."
+        if git show-ref --quiet "refs/heads/$BRANCH_NAME"; then
+          echo "Branch '$BRANCH_NAME' already exists. Switching to it."
+          git switch "$BRANCH_NAME"
+        else
+          git switch -c "$BRANCH_NAME"
+          echo "Successfully created and switched to new branch '$BRANCH_NAME'."
+        fi
+    silent: false
+    
+  # --- AI Context Generation Task ---
+  ai:
+    summary: "Generates a context file ({{.AI_OUTPUT_FILE}}) for AI interaction, tailored for this Apps Script project."
+    # No dependencies needed for this simple setup
+    # deps: []
+    preconditions:
+      # Preconditions check paths relative to the Taskfile (project root)
+      - sh: '[ "$(pwd)" = "{{.TASKFILE_DIR}}" ]'
+        msg: "AI task must be run from the project root directory ({{.TASKFILE_DIR}})."
+      - sh: "[ -d .git ]"
+        msg: "AI task relies on Git and should be run from the root of a Git repository."
+      # Ensure required command-line tools are available
+      - sh: "command -v git"
+        msg: "'git' command not found."
+      - sh: "command -v grep"
+        msg: "'grep' command not found."
+      - sh: "command -v clasp"
+        msg: "'clasp' command not found. Ensure it's installed (e.g., via Nix or npm)."
+      - sh: "command -v stat"
+        msg: "'stat' command not found (used for file size checking)."
+    desc: |
+      Generates a file ({{.AI_OUTPUT_FILE}}) containing structured context for an AI,
+      tailored for this Google Apps Script/Clasp project using shell commands.
+      NOTE: Inclusion/Exclusion rules are defined in Taskfile vars. Must be run from project root.
+      Includes:
+      1. User prompt (interactive).
+      3. Key Tool Versions & Environment Details (OS, Clasp, Node/NPM if detected).
+      4. Git status summary.
+      5. Project directory structure (Level 2).
+      6. Content of relevant files (based on regex: {{.INCLUDE_EXTENSIONS_REGEX}})
+         Excluding paths based on regex: {{.EXCLUDE_PATHS_REGEX}}
+         Respects .gitignore. Max file size: {{.MAX_FILE_SIZE_KB}}KB.
+    cmds:
+      - |
+        set -e # Exit immediately if a command exits with a non-zero status.
+
+        # --- Configuration ---
+        OUTPUT_FILE="{{.AI_OUTPUT_FILE}}"
+        MAX_SIZE_BYTES=$(( {{.MAX_FILE_SIZE_KB}} * 1024 ))
+        INCLUDE_REGEX='{{.INCLUDE_EXTENSIONS_REGEX}}'
+        EXCLUDE_REGEX='{{.EXCLUDE_PATHS_REGEX}}'
+
+        # --- Initialization ---
+        echo "Generating AI context for Apps Script project in $OUTPUT_FILE..."
+        > "$OUTPUT_FILE" # Overwrite/create the file
+
+        # --- Section: User Prompt ---
+        printf "### Prompt\n\n" >> "$OUTPUT_FILE"
+        echo "---------------------------------------------------------------------" >&2
+        echo "Enter a prompt for the AI (e.g., 'Implement X function in webapp.js', 'Add Y feature to the UI', 'Refactor gasSheetManager.js')." >&2
+        echo "Be specific about goals, files, functions, or errors." >&2
+        echo "---------------------------------------------------------------------" >&2
+        USER_PROMPT=""
+        while [ -z "$USER_PROMPT" ]; do
+          read -r -p "> " USER_PROMPT
+          if [ -z "$USER_PROMPT" ]; then
+            echo "Prompt cannot be empty. Please try again." >&2
+          fi
+        done
+        printf "%s\n\n" "$USER_PROMPT" >> "$OUTPUT_FILE"
+
+        # --- Section: Environment Context ---
+        printf "### Environment Context\n\n" >> "$OUTPUT_FILE"
+        printf "OS Type: " >> "$OUTPUT_FILE"
+        { uname -s || echo "Unknown"; } >> "$OUTPUT_FILE"
+        printf "Key tool versions:\n" >> "$OUTPUT_FILE"
+        { printf "  Clasp: "; clasp --version || echo "Not found / Error"; } >> "$OUTPUT_FILE"
+        # Check for Node/NPM as they are often used with Clasp locally
+        { printf "  Node: "; node --version || echo "Not found"; } >> "$OUTPUT_FILE"
+        { printf "  NPM: "; npm --version || echo "Not found"; } >> "$OUTPUT_FILE"
+        # Include Go Task version if it's defined in dev.nix
+        { printf "  Go Task: "; task --version || echo "Not found"; } >> "$OUTPUT_FILE"
+        if [ -f ".idx/dev.nix" ]; then
+          printf "Nix environment definition found in included .idx/dev.nix file.\n" >> "$OUTPUT_FILE"
+        else
+          printf "Nix environment definition (.idx/dev.nix) not found.\n" >> "$OUTPUT_FILE"
+        fi
+        printf "\n\n" >> "$OUTPUT_FILE"
+
+        # --- Section: Git Status ---
+        printf "### Git Status (Summary)\n\n" >> "$OUTPUT_FILE"
+        printf "Provides context on recent local changes:\n\n" >> "$OUTPUT_FILE"
+        { git status --short || echo "Failed to get git status (maybe not a git repo?)."; } >> "$OUTPUT_FILE"
+        printf "\n\n" >> "$OUTPUT_FILE"
+
+        # --- Section: Project Structure ---
+        printf "### Project Structure (Top Levels)\n\n" >> "$OUTPUT_FILE"
+        printf "Directory layout (up to 2 levels deep):\n\n" >> "$OUTPUT_FILE"
+        # Update ignore pattern for tree command
+        { tree -L 2 -a -I '.git|.clasp.json|node_modules|__pycache__|.DS_Store|.idx|.vscode|*.log|ai_context.txt' || ls -Ap | grep '/$' || echo "'tree' command not found, using 'ls'."; } >> "$OUTPUT_FILE"
+        printf "\n\n" >> "$OUTPUT_FILE"
+
+        # --- Section: Relevant File Contents ---
+        printf "### Relevant Code Files Follow\n\n" >> "$OUTPUT_FILE"
+
+        # --- Helper Function ---
+        append_file_content() {
+          local FILE="$1"
+          local OUTPUT_FILE_INNER="$2"
+          local MAX_BYTES="$3"
+          local FILE_SIZE_BYTES
+          # Skip if not a readable regular file or if it's a symlink
+          if [ ! -f "$FILE" ] || [ ! -r "$FILE" ] || [ -L "$FILE" ]; then return; fi
+          # Get file size robustly
+          FILE_SIZE_BYTES=$(stat -c %s "$FILE" 2>/dev/null || stat -f %z "$FILE" 2>/dev/null || echo 0)
+          # Skip empty or oversized files
+          if [ "$FILE_SIZE_BYTES" -eq 0 ]; then echo "Skipping (empty file): $FILE" >&2; return; fi
+          if [ "$FILE_SIZE_BYTES" -gt "$MAX_BYTES" ]; then echo "Skipping (too large: ${FILE_SIZE_BYTES}B > ${MAX_BYTES}B): $FILE" >&2; return; fi
+          # Append file content safely
+          {
+            printf "\n======== FILE: %s ========\n" "$FILE"
+            cat "$FILE"
+            printf "\n======== END FILE: %s ========\n\n" "$FILE"
+          } >> "$OUTPUT_FILE_INNER" || { echo "Error processing file: $FILE" >&2; return 1; }
+          echo "Included: $FILE (${FILE_SIZE_BYTES}B)" >&2
+        }
+
+        # --- File Processing ---
+        echo "Filtering and processing files tracked/untracked by Git..." >&2
+        # Use git ls-files to find relevant files respecting .gitignore, filter by regex
+        while IFS= read -r file_path; do
+          # Use the helper function to append content if valid
+          append_file_content "$file_path" "$OUTPUT_FILE" "$MAX_SIZE_BYTES"
+        done < <(git ls-files -co --exclude-standard | grep -E "$INCLUDE_REGEX" | grep -vE "$EXCLUDE_REGEX")
+
+        # --- Explicit Additions (Optional - Guarantee core files if somehow missed) ---
+        # echo "Checking for explicit additions..." >&2
+        # for f in ./Taskfile.yaml ./nxt-lunch-app/gas/appsscript.json; do
+        #     if [ -f "$f" ] && ! grep -q "======== FILE: $f ========" "$OUTPUT_FILE"; then
+        #         append_file_content "$f" "$OUTPUT_FILE" "$MAX_SIZE_BYTES"
+        #     fi
+        # done
+
+        echo "Successfully generated AI context in $OUTPUT_FILE"
+    silent: false # Show command output for easier debugging

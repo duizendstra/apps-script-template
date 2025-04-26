@@ -1,0 +1,63 @@
+{
+  // --- IDX AI Settings ---
+  "IDX.aI.enableInlineCompletion": true,
+  "IDX.aI.enableCodebaseIndexing": true,
+
+  // --- File Associations ---
+  // Tell VS Code to treat .gs files as JavaScript
+  "files.associations": {
+    "*.gs": "javascript"
+  },
+
+  // --- Formatting ---
+  "editor.formatOnSave": true,
+  // Set Prettier as the default for associated files
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // --- Linting
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+
+  // --- Editor Behavior ---
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "editor.matchBrackets": "always",
+  "files.autoSave": "onFocusChange",
+
+  // --- File Management ---
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true
+    // other excludes...
+  },
+  "search.exclude": {
+    "**/node_modules": true
+    // other excludes...
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "[nix]": {
+    "editor.defaultFormatter": "google.nix-language"
+  }
+}
