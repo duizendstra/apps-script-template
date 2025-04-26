@@ -13,8 +13,8 @@
   env = {
     # Define where npm should install global packages
     NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-    # Add the bin directory for global packages to the PATH
-    PATH = "$HOME/.npm-global/bin:$PATH";
+    # DO NOT MANUALLY SET PATH HERE - This caused the conflict.
+    # The shell environment should pick up $HOME/.npm-global/bin if NPM_CONFIG_PREFIX is set.
   };
 
   # IDX specific settings
@@ -30,18 +30,33 @@
       # Runs once when the workspace is created
       onCreate = {
         # Conditionally install clasp based on the 'useAlphaClasp' template parameter.
-        # Template parameters are available as IDX_PARAM_<paramName> env variables.
         install-clasp = ''
           echo "Setting up clasp..."
+          # Ensure the target directory exists before installing
+          mkdir -p "$HOME/.npm-global/bin"
+          # Temporarily add the target bin to the PATH for this script's execution context
+          export PATH="$HOME/.npm-global/bin:$PATH"
+
           if [ "$IDX_PARAM_USEALPHACLASP" = "true" ]; then
             echo "Installing @google/clasp@alpha..."
-            npm install -g @google/clasp@alpha
+            # Use --prefix for clarity, although NPM_CONFIG_PREFIX should handle it
+            npm install -g --prefix "$HOME/.npm-global" @google/clasp@alpha
           else
             echo "Installing latest stable @google/clasp..."
-            npm install -g @google/clasp
+            npm install -g --prefix "$HOME/.npm-global" @google/clasp
           fi
-          echo "clasp installation complete. Version:"
-          clasp --version || echo "clasp command not found after install attempt." # Verify install
+
+          echo "clasp installation complete. Verifying..."
+          # Check if the binary exists where expected
+          if [ -f "$HOME/.npm-global/bin/clasp" ]; then
+            echo "clasp executable found at $HOME/.npm-global/bin/clasp"
+            # Attempt to run clasp using the temporarily modified PATH
+            clasp --version
+          else
+            echo "ERROR: clasp executable not found in $HOME/.npm-global/bin after install."
+            echo "Check npm output above for errors."
+          fi
+
           echo "------"
           echo "Template created. Please see README.md for next steps."
           code README.md # Open README after setup
@@ -50,8 +65,8 @@
 
       # Runs every time the workspace starts
       onStart = {
-        # Optional: Verify clasp is still available on start
-        # check-clasp = "clasp --version || echo 'clasp not found - run setup?'";
+        # You could add path verification here if needed for debugging later:
+        # verify-clasp = "echo 'Checking for clasp in onStart:' && which clasp && clasp --version || echo 'clasp not found in onStart PATH'"
       };
     };
   };
