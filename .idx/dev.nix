@@ -1,47 +1,57 @@
 # IDX environment configuration for Google Apps Script Development using clasp
 { pkgs, ... }: {
-  # Use a stable channel. Consider "unstable" or pinning if clasp version is too old.
-  channel = "stable-24.11";
+  channel = "stable-24.11"; # Base channel, Node.js comes from here
 
-  # Packages needed for clasp and general development
+  # We only need Node.js (which includes npm) and Git directly from Nix.
+  # clasp will be installed via npm in the onCreate hook based on user choice.
   packages = [
-    # Node.js (LTS recommended) is required for clasp
-    pkgs.nodejs
-
-    # clasp CLI - using nodePackages for potentially newer versions
-    pkgs.nodePackages."@google/clasp"
-
-    # Git is usually included, but good practice to ensure it's available
+    pkgs.nodejs # Provides node and npm
     pkgs.gitMinimal
   ];
 
-  # Environment variables (usually none needed specifically for clasp)
-  env = {};
+  # Configure environment for globally installed npm packages
+  env = {
+    # Define where npm should install global packages
+    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+    # Add the bin directory for global packages to the PATH
+    PATH = "$HOME/.npm-global/bin:$PATH";
+  };
 
   # IDX specific settings
   idx = {
-    # Recommended VS Code extensions
     extensions = [
-      "dbaeumer.vscode-eslint" # If you plan to use ESLint
-      "esbenp.prettier-vscode" # If you plan to use Prettier
+      "dbaeumer.vscode-eslint"
+      "esbenp.prettier-vscode"
       "GitHub.vscode-pull-request-github"
     ];
-
-    # Previews are typically not used for Apps Script itself
     previews = { enable = false; };
 
-    # Workspace lifecycle commands
     workspace = {
       # Runs once when the workspace is created
       onCreate = {
-         # Recommend opening the README first
-         open-readme = "echo 'Template created. Please see README.md for next steps.' && code README.md";
-         # No 'npm install' needed here as clasp is installed via Nix
+        # Conditionally install clasp based on the 'useAlphaClasp' template parameter.
+        # Template parameters are available as IDX_PARAM_<paramName> env variables.
+        install-clasp = ''
+          echo "Setting up clasp..."
+          if [ "$IDX_PARAM_USEALPHACLASP" = "true" ]; then
+            echo "Installing @google/clasp@alpha..."
+            npm install -g @google/clasp@alpha
+          else
+            echo "Installing latest stable @google/clasp..."
+            npm install -g @google/clasp
+          fi
+          echo "clasp installation complete. Version:"
+          clasp --version || echo "clasp command not found after install attempt." # Verify install
+          echo "------"
+          echo "Template created. Please see README.md for next steps."
+          code README.md # Open README after setup
+        '';
       };
+
       # Runs every time the workspace starts
       onStart = {
-         # Optional: Display clasp version on start
-         # check-clasp = "clasp --version";
+        # Optional: Verify clasp is still available on start
+        # check-clasp = "clasp --version || echo 'clasp not found - run setup?'";
       };
     };
   };

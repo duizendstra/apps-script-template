@@ -9,6 +9,8 @@
 
 This template provides a basic structure for developing Google Apps Script projects locally using `clasp` within Google IDX / Firebase Studio.
 
+During workspace creation, `clasp` (either the latest stable or alpha version, based on your selection) was automatically installed using `npm`.
+
 ## Prerequisites
 
 *   A Google Account.
@@ -17,45 +19,44 @@ This template provides a basic structure for developing Google Apps Script proje
 ## Getting Started
 
 1.  **Log in to clasp:**
-    *   Open the IDX terminal (Ctrl+` or Cmd+`).
+    *   The necessary version of `clasp` should already be installed. Open the IDX terminal (Ctrl+` or Cmd+`).
     *   Run the command: `clasp login`
-    *   Follow the prompts to authorize `clasp` with your Google Account.
+    *   Follow the prompts to authorize `clasp` with your Google Account. You only need to do this once per workspace/account.
 
 2.  **Choose Your Path:**
 
     *   **A) Create a NEW Standalone Apps Script Project:**
         *   Run: `clasp create --title "Your Project Title Here" --rootDir ./`
-        *   Replace `"Your Project Title Here"` with a suitable name.
-        *   This creates a new script project on Google Drive and links it to this local directory (creates a `.clasp.json` file - **do not commit this file!**).
+        *   *(Optional: If you provided a Project Title parameter during setup, you could use that here)*.
+        *   This creates a new script project on Google Drive and links it to this local directory (creates `.clasp.json`).
 
     *   **B) Link to an EXISTING Apps Script Project:**
-        *   Find the **Script ID** of your existing project. Open the script in the Apps Script editor; the ID is in the URL: `https://script.google.com/d/<SCRIPT_ID>/edit`.
+        *   Find the **Script ID** of your existing project (from the script editor URL).
         *   Run: `clasp pull <SCRIPT_ID> --rootDir ./`
-        *   Replace `<SCRIPT_ID>` with your actual Script ID.
-        *   This will pull the existing code from the cloud, potentially overwriting local files like `Code.gs` and `appsscript.json`. It also creates the `.clasp.json` file.
+        *   This pulls the existing code, potentially overwriting local files, and creates `.clasp.json`.
 
 3.  **Develop Locally:**
-    *   Edit the `.gs` or `.js` files (for V8 runtime) and the `appsscript.json` manifest.
+    *   Edit `.gs`/`.js` files and `appsscript.json`.
     *   Refer to the [Apps Script documentation](https://developers.google.com/apps-script).
 
 4.  **Push Changes:**
-    *   When ready to upload your local changes to Google: `clasp push`
-    *   Check the output for any errors. Use `clasp push -f` to force overwrite if necessary, but use with caution.
+    *   Upload local changes: `clasp push`
+    *   Use `clasp push -f` to force overwrite if needed (use with caution).
 
 5.  **Test:**
-    *   Open the script in the online Apps Script editor (`clasp open`) to run functions, set triggers, or test it within its bound Google Workspace application (Sheets, Docs, etc.).
+    *   Open in the online editor: `clasp open`
 
 ## Included Files
 
-*   `.idx/dev.nix`: Configures the IDX environment (installs `node`, `clasp`).
+*   `.idx/dev.nix`: Configures the IDX environment (installs `node`, sets up `npm` globals, installs chosen `clasp` version).
 *   `appsscript.json`: The Apps Script project manifest. **Remember to set your `timeZone`!**
-*   `Code.gs`: Default script file. Add your code here or create more `.gs`/`.js` files.
-*   `.claspignore`: Specifies files/directories for `clasp` to ignore when pushing.
-*   `.gitignore`: Specifies files/directories for `git` to ignore. Includes `.clasp.json` by default to prevent committing credentials.
+*   `Code.gs`: Default script file.
+*   `.claspignore`: Specifies files for `clasp` to ignore.
+*   `.gitignore`: Specifies files for `git` to ignore (includes `.clasp.json`).
 *   `README.md`: This file.
 
 ## Next Steps
 
 *   Customize `appsscript.json` (scopes, libraries, add-on settings).
-*   Write your Apps Script code in `Code.gs` or other `.gs`/`.js` files.
-*   Consider adding linting/formatting tools (ESLint, Prettier) using a `package.json` and `npm install`.
+*   Write your Apps Script code.
+*   Consider adding linting/formatting (ESLint, Prettier) via `package.json` (`npm install`).

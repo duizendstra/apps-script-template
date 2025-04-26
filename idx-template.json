@@ -1,25 +1,29 @@
 {
   "name": "Google Apps Script Project (clasp)",
-  "description": "Sets up a basic Google Apps Script project structure for local development using clasp and IDX. Includes recommended environment configuration.",
+  "description": "Sets up a Google Apps Script project for local development using clasp. Allows choosing between latest stable or alpha clasp version.",
   "icon": "https://www.gstatic.com/script/apps_script_1x_24dp.png",
-  "tags": ["google", "apps script", "clasp", "serverless"],
+  "tags": ["google", "apps script", "clasp", "serverless", "template"],
   "files": [
-    ".idx/dev.nix",      // Environment configuration for IDX
-    "appsscript.json",   // Apps Script manifest
-    "Code.gs",           // Default script file
-    ".claspignore",      // Tells clasp which files NOT to push
-    ".gitignore",        // Tells git which files to ignore
-    "README.md"          // Instructions for the user
-    // Optional: "package.json" if you want to include linters etc.
+    ".idx/dev.nix",      
+    "Code.gs",          
+    ".claspignore",      
+    ".gitignore",        
+    "README.md"          
   ],
   "params": [
-    // Example parameter (optional, can be removed if not needed initially)
-    // {
-    //   "name": "projectName",
-    //   "label": "Project Title",
-    //   "description": "Title for the new Apps Script project (used in clasp create)",
-    //   "defaultValue": "My New Apps Script Project",
-    //   "type": "string"
-    // }
+    {
+      "name": "useAlphaClasp",
+      "label": "Use clasp alpha version?",
+      "description": "Install the latest alpha pre-release version of clasp instead of the latest stable version.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "projectName",
+      "label": "Project Title",
+      "description": "Optional: Initial title if creating a new Apps Script project.",
+      "type": "string",
+      "required": false
+    }
   ]
 }
