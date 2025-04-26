@@ -1,0 +1,7 @@
+{
+  "timeZone": "America/New_York", // CHANGE TO YOUR TIMEZONE: https://developers.google.com/apps-script/reference/base/session#getscripttimezone
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER", // Enables Cloud Logging
+  "runtimeVersion": "V8" // Use the modern V8 runtime
+}
