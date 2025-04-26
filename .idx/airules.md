@@ -33,6 +33,7 @@ CONTEXT:
     - `README.md`: **Source for project overview, development workflow, features/goals, testing procedures.**
     - `SETUP.md`: **Source for initial one-time setup instructions (login, clasp create/pull).**
     - `.gitignore`: Specifies files/directories for Git to ignore (e.g., `.clasp.json`, `gas/config.js`).
+    - `.claspignore`: (Optional) Specifies files/directories for Clasp to ignore during push.
     - `Taskfile.yaml`: Defines automated tasks (e.g., `ai` context generation, `dev:branch`).
     - `.idx/`: IDX specific configuration.
       - `airules.md`: This file, guiding AI interaction.
@@ -40,7 +41,6 @@ CONTEXT:
     - `.vscode/`: (Optional) VS Code editor settings.
     - `.clasp.json`: (Created by setup) Local file linking project dir to scriptId, specifies `rootDir`. **Gitignored.**
   - **`gas/`:** Contains all source code pushed to Google Apps Script (`rootDir`). All `.js` files share a single global scope.
-    - `.claspignore`: (Optional) Specifies files/directories for Clasp to ignore during push.
     - `appsscript.json`: GAS project manifest (permissions, runtime, etc.).
     - `index.html`: Primary HTML file for web app UI/test harness.
     - `webapp.js`: Main server-side script handling web app requests.
@@ -84,12 +84,12 @@ RULE:
 
 - "**General:**"
 
-  - " - Do **NOT** suggest manually installing `clasp`, `node`, `git`, or `task`, or running `nix develop`. The `.idx/dev.nix` file ensures these tools are already available in the environment when the workspace starts."
+  - " - **CRITICAL for Setup Queries:** When asked about project setup (e.g., 'how to set up', 'walk me through setup', 'what are the setup steps?'), **strictly follow ONLY the steps outlined in the provided `SETUP.md` file**. Do **NOT** suggest manually installing tools (`clasp`, `node`, etc.) as `.idx/dev.nix` handles this. Do **NOT** deviate from the specified `clasp login` (requiring the `curl` step) or the `clasp create`/`pull` procedures described in `SETUP.md`. Do **NOT** suggest alternative commands like `clasp clone` or `clasp login --no-localhost`. Quote or accurately summarize the steps directly from `SETUP.md`."
   - " - Explain the _purpose_ and _reasoning_ behind suggested code changes."
   - " - When adding/modifying core functionality, suggest updating relevant documentation (`README.md`)."
   - " - Focus comments in code on the _why_, not the _what_."
   - " - Acknowledge `clasp push` is needed to sync changes."
-  - " - Refer to `SETUP.md` **only** for the initial one-time setup steps (`clasp login`, `clasp create`/`pull`)."
+  - " - Refer to `SETUP.md` **ONLY** for the initial one-time setup steps (`clasp login`, `clasp create`/`pull`, prerequisites, git init)."
   - " - Refer to `README.md` for **all other** information: project overview, configuration needs (like `gas/config.js`), ongoing development workflow (edit, push, test), architecture, features, goals, testing procedures, key concepts."
 
 - "**Apps Script / JavaScript Specific:**"
