@@ -2,60 +2,66 @@
 
 # One-Time Setup for Google Apps Script Project Template
 
-Follow these steps **once** when you first create or clone this project workspace.
+Follow these steps **once** when you first create or clone this project workspace in Project IDX.
 
-## Prerequisites
+## 1. Verify Environment & Tools
 
-- A **Google Account**.
-- Enable the **Google Apps Script API** in your Google Cloud Platform project:
-  - Go to: [https://console.developers.google.com/apis/library/script.googleapis.com](https://console.developers.google.com/apis/library/script.googleapis.com)
-  - Select your Cloud project (or create one).
-  - Click "Enable".
+- **`clasp` is Pre-Installed:** Your Project IDX environment automatically installs `clasp` (and other tools like `node`, `git`, `task`) based on the `.idx/dev.nix` file. **You do NOT need to install `clasp` manually.**
+- **Verify Installation:** Open the IDX terminal (Ctrl+` or Cmd+`) and run:
+  ```bash
+  clasp --version
+  ```
+  You should see the installed version number (e.g., `2.4.2`). If not, there might be an issue with the IDX environment build.
 
-## Initial Clasp Setup
+## 2. Authorize `clasp` (Global Login)
 
-1.  **Log in to clasp:**
+- This step grants `clasp` permission to manage Apps Script projects using **your** Google Account credentials.
+- In the terminal, run:
+  ```bash
+  clasp login
+  ```
+- Follow the instructions: Open the provided URL in a browser, choose your Google Account, and grant the requested permissions.
+- **Outcome:** This creates or updates the **global** credential file at `~/.clasprc.json` (inside the IDX environment's home directory). This file contains sensitive authentication tokens and is **NOT** part of your project directory. This login is typically only needed once per workspace.
 
-    - The `clasp` command-line tool should already be installed in your IDX environment (via `.idx/dev.nix`).
-    - Open the IDX terminal (Ctrl+` or Cmd+`).
-    - Run the command:
-      ```bash
-      clasp login
-      ```
-    - This will open a browser window/tab. Follow the prompts to choose your Google Account and authorize `clasp` to manage your Apps Script projects.
-    - Return to the terminal. You should see "Authorization successful." This creates a global configuration file (`~/.clasprc.json`) containing your credentials. **You only need to do this once per IDX workspace (or wherever clasp is installed).**
+## 3. Link Local Project Directory to Google Apps Script
 
-2.  **Link Your Local Project to Google Apps Script:**
+- This step creates the **local `.clasp.json` file** in your project root. This file tells `clasp` which specific Apps Script project your `gas/` directory corresponds to. It contains the `scriptId` and `rootDir`. **This file does NOT contain your sensitive auth tokens.**
+- Choose **ONE** of the following options (A or B):
 
-    - Decide if you are creating a **new** script or linking to an **existing** one.
+- **Option A: Create a NEW Apps Script Project**
 
-    - **A) Create a NEW Standalone Apps Script Project:**
+  - Use this if you are starting a new project from scratch based on this template.
+  - In the terminal (at the project root), run:
+    ```bash
+    clasp create --title "Your Project Title Here" --rootDir ./gas
+    ```
+  - Replace `"Your Project Title Here"` with your desired project name.
+  - **Outcome:** Creates a new script file on Google Drive AND creates the local `.clasp.json` linking your workspace to it.
 
-      - In the terminal (ensure you are in the project's root directory), run:
-        ```bash
-        clasp create --title "Your Project Title Here" --rootDir ./gas
-        ```
-      - Replace `"Your Project Title Here"` with a suitable name for your script.
-      - The `--rootDir ./gas` tells `clasp` that your Apps Script source code resides in the `gas/` subdirectory.
-      - This command does two things:
-        1.  Creates a new, blank Apps Script project file in your Google Drive.
-        2.  Creates a `.clasp.json` file in your local project root directory. This file contains the `scriptId` of the newly created project and the `rootDir`. **Do NOT commit `.clasp.json` to Git (it's ignored by `.gitignore`).**
+- **Option B: Link to an EXISTING Apps Script Project**
+  - Use this if you want your local `gas/` directory to reflect an existing online project.
+  - Find the **Script ID** of your existing project from its URL in the Apps Script editor (`.../d/<SCRIPT_ID>/edit`).
+  - In the terminal (at the project root), run:
+    ```bash
+    clasp pull <SCRIPT_ID> --rootDir ./gas
+    ```
+  - Replace `<SCRIPT_ID>` with the actual ID.
+  - **Outcome:** Creates the local `.clasp.json` linking your workspace AND downloads the code from the online project into `gas/`, **overwriting** existing files in `gas/`.
 
-    - **B) Link to an EXISTING Apps Script Project:**
-      - Open your existing Apps Script project in the online editor.
-      - Find its **Script ID** in the URL: `https://script.google.com/d/<SCRIPT_ID>/edit`. Copy the `<SCRIPT_ID>` part.
-      - In the terminal (in the project root directory), run:
-        ```bash
-        clasp pull <SCRIPT_ID> --rootDir ./gas
-        ```
-      - Replace `<SCRIPT_ID>` with the actual ID you copied.
-      - The `--rootDir ./gas` specifies the local source directory.
-      - This command does two things:
-        1.  Creates the `.clasp.json` file locally, linking this directory to the existing script via its ID.
-        2.  **Downloads (pulls)** the code and manifest (`appsscript.json`) from the existing online project into your local `gas/` directory, potentially **overwriting** any files you already have there (like the template's `Code.gs` or `appsscript.json`).
+## 4. Verify `.gitignore`
 
-## Next Steps
+- Open the `.gitignore` file in your project root.
+- **Confirm** that both `.clasp.json` and `gas/config.js` are listed. This is critical to prevent committing the project link file or sensitive configurations.
 
-Once you have completed these steps, you have successfully linked your local project environment to a Google Apps Script project.
+## 5. Create `gas/config.js` (If Needed)
 
-Refer to the main **`README.md`** file for information about the project structure, the development workflow (editing, pushing, testing), and other project details.
+- Many projects require configuration (API keys, sheet IDs, email lists, etc.).
+- If needed, **manually create** the file `config.js` inside the `gas/` directory.
+- Add your configuration variables inside this file (e.g., `const CONFIG = { setting: 'value' };`).
+- This file is **intentionally ignored by Git** (as specified in `.gitignore`) and must be managed manually.
+
+## Setup Complete!
+
+Your local environment is now configured and linked to your Google Apps Script project.
+
+➡️ Proceed to **`README.md`** for project overview, development workflow (editing, pushing, testing), and architecture details.

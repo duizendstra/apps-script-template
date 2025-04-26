@@ -7,7 +7,7 @@
 
 # Google Apps Script Project Template
 
-This template provides a basic structure for developing Google Apps Script projects locally using `clasp` within Google IDX / Firebase Studio. It uses a Factory Function pattern for manager modules and modern JavaScript (V8 runtime).
+This template provides a structure for developing Google Apps Script projects locally using `clasp` within Project IDX. It uses a Factory Function pattern for manager modules and modern JavaScript (V8 runtime).
 
 **➡️ For initial one-time setup instructions (logging in, linking project), please see `SETUP.md`.**
 
@@ -27,7 +27,7 @@ _(Assumes you have completed the one-time steps in `SETUP.md`)_
     - Modify existing `.js` files (e.g., `webapp.js`, files in `managers/`) or create new ones within `gas/`.
     - If building a web app, edit `gas/index.html` and related client-side CSS/JS.
     - Update the manifest `gas/appsscript.json` as needed (e.g., add OAuth scopes, configure web app).
-    - **Crucially:** If your project requires configuration (API keys, specific IDs, emails), create/update the **`gas/config.js`** file (which is **gitignored**). This file is manually managed. _The AI assistant cannot see the contents of `config.js`._
+    - **Configuration (`gas/config.js`):** If your project requires configuration (API keys, specific IDs, emails), create/update the **`gas/config.js`** file. This file is **gitignored** and must be managed manually. The AI assistant cannot see its contents but expects a `CONFIG` object to be available based on its structure.
 
 2.  **Push Changes to Google:**
 
@@ -36,46 +36,50 @@ _(Assumes you have completed the one-time steps in `SETUP.md`)_
       ```bash
       clasp push
       ```
-    - This command uploads the contents of your local `gas/` directory (respecting `.claspignore`) to the linked Apps Script project online.
-    - If you encounter conflicts (e.g., changes made directly in the online editor), `clasp` might prompt you. Use `clasp push -f` to force overwrite the online version with your local version (use with caution).
+    - This command uploads the contents of your local `gas/` directory (respecting `.claspignore`, if present) to the linked Apps Script project online.
+    - If you encounter conflicts, use `clasp push -f` to force overwrite (use with caution).
 
 3.  **Test Your Changes:**
 
-    - **Run Functions:** Open the script in the online editor (`clasp open`), select a function from the dropdown, and click "Run". Check `View > Logs` or `View > Executions` for output and errors.
-    - **Test Web App (if applicable):** Deploy your web app (or use the test deployment URL). Access the URL in your browser. Use browser developer tools (Console, Network tabs) and GAS logs for debugging. The `gas/index.html` in this template often serves as a test harness.
-    - **Test Triggers:** Set up time-driven or event-driven triggers in the online editor (`Triggers` section) and monitor their executions.
+    - **Run Functions:** Open the script online (`clasp open`), select a function, and click "Run". Check logs (`View > Logs` / `Executions`).
+    - **Test Web App:** Deploy the web app (or use the test deployment) and access its URL. Use browser developer tools and GAS logs.
+    - **Test Triggers:** Set up triggers online and monitor executions.
 
 4.  **Version Control (Git):**
-    - Regularly commit your changes:
-      ```bash
-      git add .
-      git commit -m "Your descriptive commit message"
-      git push
-      ```
-    - Use branches (`git checkout -b feature/new-thing`) for new features or fixes.
+    - Regularly commit your changes (`git add .`, `git commit`, `git push`).
+    - Use branches for features/fixes.
 
 ## Project Structure Overview
 
-- **`README.md`**: (This file) Project overview, development workflow, structure.
-- **`SETUP.md`**: One-time setup instructions.
+- **`README.md`**: (This file) Project overview, development workflow, structure details.
+- **`SETUP.md`**: One-time setup instructions (login, linking).
 - **`.idx/`**: IDX configuration.
   - `dev.nix`: Nix environment setup (installs `clasp`, `go-task`, etc.).
   - `airules.md`: Rules and context for the IDX AI assistant.
-- **`.vscode/`**: (Optional) VS Code settings for the workspace.
-- **`gas/`**: **Contains all code pushed to Apps Script.**
+- **`.vscode/`**: (Optional) VS Code workspace settings.
+- **`gas/`**: **Contains all code pushed to Apps Script.** (`rootDir` for clasp).
   - `appsscript.json`: The project manifest (scopes, runtime, web app settings). **Crucial.**
   - `webapp.js`: (If web app) Handles `doGet` and dispatches UI actions.
   - `index.html`: (If web app) Main UI file.
-  - `managers/`: Contains modular `.js` files using Factory Functions for specific tasks (e.g., `gasSheetManager.js`, `gasErrorManager.js`).
+  - `managers/`: Contains modular `.js` files using Factory Functions (e.g., `gasSheetManager.js`).
   - `config.js`: **Manually created, gitignored.** Holds project-specific configuration.
   - _(Other `.js`, `.html` files as needed)_
 - **`.gitignore`**: Tells Git which files to ignore (includes `.clasp.json`, `gas/config.js`).
 - **`.claspignore`**: (Optional) Tells `clasp` which files within `gas/` _not_ to push.
-- **`Taskfile.yaml`**: Defines automation tasks using Go Task (e.g., `task ai`, `task dev:branch`).
+- **`Taskfile.yaml`**: Defines automation tasks using Go Task (e.g., `task ai`).
+- **`.clasp.json`**: (Created during setup) Local file linking project to `scriptId`. **Gitignored.**
+
+## Key Concepts & Patterns
+
+- **Global Scope:** All `.js` files in `gas/` share one global scope. No `require` or `import` needed.
+- **Factory Functions:** Managers (`gas/managers/*.js`) use this pattern (no `class`). Instantiate by calling the global factory function.
+- **Configuration:** Use the manually created, gitignored `gas/config.js` for runtime settings.
+- **Error Handling:** Use `try...catch` and the `gasErrorManager`'s `throwError` method.
+- **Time Limits:** Use the `gasTimeManager`'s `resetStartTime()` and `hasEnoughTime()` methods for long operations.
 
 ## Next Steps / Further Development
 
 - Customize `gas/appsscript.json` with the correct `timeZone` and necessary `oauthScopes`.
 - Implement the core logic of your script in the `.js` files within `gas/`.
-- Flesh out the `gas/config.js` file with your project's specific settings.
-- (Optional) Set up linters/formatters like ESLint and Prettier (requires adding `package.json` and running `npm install`).
+- Populate the `gas/config.js` file with your project's specific settings.
+- (Optional) Set up ESLint/Prettier via `package.json`.
