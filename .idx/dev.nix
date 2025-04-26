@@ -5,9 +5,9 @@
   packages = [
     pkgs.google-clasp
     pkgs.go-task
-    # Consider explicitly adding:
-    # pkgs.nodejs
-    # pkgs.gitMinimal
+
+    pkgs.nodejs
+    pkgs.gitMinimal
   ];
 
   # Configure environment

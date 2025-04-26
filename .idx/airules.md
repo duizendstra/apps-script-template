@@ -9,7 +9,7 @@
 # --- GENERATE: Define files included in codebase context ---
 
 GENERATE:
-include: # Core application code - gas/**/\*.js - gas/**/_.html - gas/appsscript.json # Project documentation and config - README.md # Include root README (THE PRIMARY DOC) # Scripts and development environment - .idx/dev.nix # Include Nix config for env context - .vscode/settings.json # Include VSCode settings for editor context # Root level configuration if any - .gitignore - .claspignore # If using this file - Taskfile.yaml # Include Taskfile # - package.json # Uncomment if using npm for local dev dependencies # - tsconfig.json # Uncomment if using TypeScript locally before transpiling
+include: # Core application code - gas/**/\*.js - gas/**/_.html - gas/appsscript.json # Project documentation and config - README.md # Include root README (Project Overview, Workflow) - SETUP.md # Include Setup instructions # Scripts and development environment - .idx/dev.nix # Include Nix config for env context - .vscode/settings.json # Include VSCode settings for editor context # Root level configuration if any - .gitignore - .claspignore # If using this file - Taskfile.yaml # Include Taskfile # - package.json # Uncomment if using npm for local dev dependencies # - tsconfig.json # Uncomment if using TypeScript locally before transpiling
 exclude: - .git/** - node_modules/** # Exclude build dependencies - .clasp.json # CRITICAL: Contains sensitive auth tokens # gas/config.js # CRITICAL: Excluded via .gitignore, ensure it's listed there if not here - .idx/** # Exclude AI rules itself and other IDX dynamic config # - .vscode/** # Decide if you want to exclude all VSCode or just specific state - _.log # gas/scratchpad.js # Exclude scratchpad unless needed for context - ai_context.txt # Exclude the generated context file itself
 
 # --- CONTEXT: High-level information about the project ---
@@ -17,7 +17,7 @@ exclude: - .git/** - node_modules/** # Exclude build dependencies - .clasp.json 
 CONTEXT:
 
 - project_description: |
-  A Google Apps Script (GAS) web application developed using modern JavaScript (V8 runtime) and managed locally with the Clasp CLI tool. The project, with code primarily located in `gas/`, implements a Lunch Ordering system. It interacts with Google Workspace services (Calendar, Sheets, Groups, Email) via dedicated manager modules created using a Factory Function pattern. A simple user interface (`gas/index.html`) allows manual triggering of core processes for testing. Development primarily occurs in Project IDX, utilizing Nix for environment setup.
+  A Google Apps Script (GAS) web application developed using modern JavaScript (V8 runtime) and managed locally with the Clasp CLI tool. The project, with code primarily located in `gas/`, implements a Lunch Ordering system. It interacts with Google Workspace services (Calendar, Sheets, Groups, Email) via dedicated manager modules created using a Factory Function pattern. A simple user interface (`gas/index.html`) allows manual triggering of core processes for testing. Development primarily occurs in Project IDX, utilizing Nix for environment setup. **See `SETUP.md` for initial setup and `README.md` for workflow and project details.**
 - tech_stack: |
   - Google Apps Script (Server-side JavaScript, V8 Runtime, Global Scope)
   - Client-side HTML, CSS, JavaScript (`gas/index.html`)
@@ -30,7 +30,8 @@ CONTEXT:
   - Taskfile (Task Runner, currently for `ai` context generation)
 - architecture_overview: |
   - **Root Directory:**
-    - `README.md`: **Primary source for setup, configuration, development workflow, project overview, features/goals, and manual testing procedures.**
+    - `README.md`: **Source for project overview, development workflow, features/goals, and manual testing procedures.**
+    - `SETUP.md`: **Source for initial one-time setup instructions (login, clasp create/pull).**
     - `.gitignore`: Specifies files/directories for Git to ignore (e.g., `.clasp.json`, `gas/config.js`).
     - `.claspignore`: (Optional) Specifies files/directories for Clasp to ignore during push (should be present in root).
     - `Taskfile.yaml`: Defines automated tasks (e.g., `ai` context generation, `dev:branch`).
@@ -57,7 +58,7 @@ CONTEXT:
   - **Error Handling:** Server-side uses `try...catch` blocks. Client-side uses `.withFailureHandler()` in `google.script.run` calls. `console.log` and `console.error` (or `Logger.log`) used for debugging on both client and server (viewable in GAS editor logs or browser console). Admin email notifications configured in `gas/config.js` might be used. `gasErrorManager` provides standardized error throwing via its `throwError` method.
   - **Coding Standards:** Modern JavaScript (`const`/`let`, arrow functions, template literals), **No `class` syntax, no `require()`, no `module.exports`, no `import`/`export` statements.** Descriptive names, JSDoc comments (for functions, params, returns), modular factory functions.
   - **Deployment:** Uses `clasp push` to sync local code (`gas/` directory) with the online GAS editor/project. Versioning/deployments managed via GAS editor UI or `clasp deploy`.
-  - **Documentation:** `README.md` is the main entry point, covering setup, features, goals, workflow, and testing procedures.
+  - **Documentation:** `README.md` covers project overview, workflow, features, goals, testing. `SETUP.md` covers initial setup.
 - security_notes: |
   - **`.clasp.json`:** This file is created by `clasp login` and contains sensitive OAuth credentials. It **MUST** be included in `.gitignore` and never committed. It should reside in the project root, _not_ in `gas/`.
   - **`gas/config.js`:** This file is manually created inside `gas/` and gitignored. It likely contains sensitive or environment-specific configuration (like specific group emails, folder IDs). AI should not suggest hardcoding these values elsewhere and should assume they come from this `CONFIG` object.
@@ -66,14 +67,14 @@ CONTEXT:
   - **Web App Deployment Settings:** (`executeAs`, `access` in `gas/appsscript.json` or deployment UI): Understand the implications. `executeAs: USER_DEPLOYING` runs as the developer; `executeAs: USER_ACCESSING` runs as the user visiting the app. `access` controls who can visit (`MYSELF`, `DOMAIN`, `ANYONE`). Choose settings appropriate for the application's purpose and security requirements.
   - **Data Exposure:** Be careful not to expose sensitive data to the client-side (`gas/index.html`) unless necessary. Avoid logging sensitive information with `console.log` if logs might be accessible inappropriately.
 - deployment_workflow_summary: |
-  **Refer to `README.md` for detailed setup and deployment instructions.** The general workflow involves:
-  1. Local Development: Edit `.js`, `.html` files within `gas/`. Create/update `gas/config.js` manually inside `gas/`.
-  2. Authentication (One-time): Run `clasp login` to authorize Clasp with Google.
-  3. Push Changes: Run `clasp push` (from the project root) to upload local code changes from `gas/` to the linked Google Apps Script project online, respecting `.claspignore`.
-  4. Manifest Changes: If `gas/appsscript.json` is modified, `clasp push` handles it. Re-authorization by users might be needed.
-  5. Testing: Test the web app via its deployment URL (see the "Manual Testing via Web App UI" section in `README.md`) or run functions directly in the GAS editor. Check logs in the GAS editor (`View > Logs` or `Executions`).
-  6. Deployment/Versioning: Create new deployments or manage versions using the GAS web editor interface (`Deploy > Manage deployments`) or potentially `clasp deploy` / `clasp version`.
-  7. Version Control: Use Git (`git add`, `git commit`, `git push`) to manage code history and collaborate.
+  **Refer to `SETUP.md` for initial authentication/linking steps and `README.md` for the ongoing development and deployment workflow.** The general workflow involves:
+  1. Initial Setup (One-time): See `SETUP.md` (`clasp login`, `clasp create`/`pull`).
+  2. Local Development: Edit `.js`, `.html` files within `gas/`. Create/update `gas/config.js` manually.
+  3. Push Changes: Run `clasp push` (from the project root).
+  4. Manifest Changes: Handled by `clasp push`. Re-authorization might be needed.
+  5. Testing: Test via web app URL, GAS editor runs, or triggers. Check logs.
+  6. Deployment/Versioning: Use GAS web editor or `clasp deploy`/`version`.
+  7. Version Control: Use Git.
 
 # --- RULE: Define specific instructions or constraints for the AI ---
 
@@ -85,7 +86,8 @@ RULE:
   - " - When adding/modifying core functionality or service interactions, suggest updating relevant documentation (`README.md` as appropriate)."
   - " - Focus comments in code on the _why_ (design decisions, non-obvious GAS quirks, complex logic) rather than the _what_ (unless complex) or _history_."
   - " - Acknowledge that changes pushed via `clasp push` might require refreshing the web app or creating a new deployment to take effect."
-  - " - Refer to `README.md` for setup, configuration, general workflow, functional requirements, overall application goals, and manual testing procedures (see the 'Manual Testing via Web App UI' section)."
+  - " - Refer to `SETUP.md` for initial clasp login and project linking instructions."
+  - " - Refer to `README.md` for general project information, configuration needs (like `gas/config.js`), development workflow (edit, push, test), functional requirements, overall application goals, and manual testing procedures."
 
 - "**Apps Script / JavaScript Specific:**"
 
@@ -142,6 +144,6 @@ RULE:
   - " - Describe the goal of requested changes clearly."
   - " - If suggesting significant code changes spanning multiple files, provide the full updated files or very clear snippets for each, clearly indicating the file path (e.g., `gas/managers/gasEventManager.js`)."
   - " - If suggesting small, localized changes, provide the relevant snippet and clearly state the filename and function/context."
-  - " - After suggesting code changes, recommend running `clasp push` to sync with the online project and then testing the changes (referencing the 'Manual Testing via Web App UI' section in `README.md` or the web app URL)."
-  - " - Reference the documentation appropriately: `README.md` for setup/workflow, features/goals, and UI testing steps."
+  - " - After suggesting code changes, recommend running `clasp push` to sync with the online project and then testing the changes (referencing testing procedures in `README.md`)."
+  - " - Reference the documentation appropriately: `SETUP.md` for initial setup, `README.md` for ongoing workflow, features/goals, and testing."
   - " - Reference the specific manager files (`gas/managers/gasCalendarManager.js`, etc.) when discussing interactions with those services."

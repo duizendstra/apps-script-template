@@ -22,10 +22,10 @@ const gasErrorManager = (params = {}) => {
    * @throws {Error} Throws a customized error.
    */
   const throwError = (params = {}) => {
-    const { 
-      message = "No message provided", 
-      errorCode = "1001", 
-      additionalProperties = {} 
+    const {
+      message = "No message provided",
+      errorCode = "1001",
+      additionalProperties = {}
     } = params;
 
     const error = new Error(message);
