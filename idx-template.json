@@ -1,6 +1,25 @@
 {
-  "name": "Hello world",
-  "description": "A template for a CLI program that prints 'hello world'",
+  "name": "Google Apps Script Project (clasp)",
+  "description": "Sets up a basic Google Apps Script project structure for local development using clasp and IDX. Includes recommended environment configuration.",
   "icon": "https://www.gstatic.com/script/apps_script_1x_24dp.png",
-  "params": []
+  "tags": ["google", "apps script", "clasp", "serverless"],
+  "files": [
+    ".idx/dev.nix",      // Environment configuration for IDX
+    "appsscript.json",   // Apps Script manifest
+    "Code.gs",           // Default script file
+    ".claspignore",      // Tells clasp which files NOT to push
+    ".gitignore",        // Tells git which files to ignore
+    "README.md"          // Instructions for the user
+    // Optional: "package.json" if you want to include linters etc.
+  ],
+  "params": [
+    // Example parameter (optional, can be removed if not needed initially)
+    // {
+    //   "name": "projectName",
+    //   "label": "Project Title",
+    //   "description": "Title for the new Apps Script project (used in clasp create)",
+    //   "defaultValue": "My New Apps Script Project",
+    //   "type": "string"
+    // }
+  ]
 }
