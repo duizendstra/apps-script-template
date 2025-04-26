@@ -25,7 +25,7 @@
     workspace = {
       onCreate = {
         # Guide the user to the SETUP file first
-        setup-reminder = "echo 'Workspace created. Start the setup using the Gemini chat";
+        setup-reminder = "echo 'Workspace created. Start the setup using the Gemini chat'";
       };
 
       # Runs every time the workspace starts
