@@ -1,6 +1,6 @@
 {
   "name": "Hello world",
   "description": "A template for a CLI program that prints 'hello world'",
-  "icon": "https://www.gstatic.com/images/branding/productlogos/studio/v1/192px.svg",
+  "icon": "https://www.gstatic.com/script/apps_script_1x_24dp.png",
   "params": []
 }
