@@ -31,7 +31,7 @@ CONTEXT:
 - architecture_overview: |
   - **Root Directory:**
     - `README.md`: **Source for project overview, development workflow, features/goals, testing procedures.**
-    - `SETUP.md`: **Source for initial one-time setup instructions (login, clasp create/pull).**
+    - `SETUP.md`: **Source for initial one-time setup instructions (login, clasp create/pull). Contains the MANDATORY `curl` step for `clasp login`.**
     - `.gitignore`: Specifies files/directories for Git to ignore (e.g., `.clasp.json`, `gas/config.js`).
     - `.claspignore`: (Optional) Specifies files/directories for Clasp to ignore during push.
     - `Taskfile.yaml`: Defines automated tasks (e.g., `ai` context generation, `dev:branch`).
@@ -59,7 +59,7 @@ CONTEXT:
   - **Error Handling:** Server-side uses `try...catch` blocks. Client-side uses `.withFailureHandler()` in `google.script.run` calls. `console.log` and `console.error` (or `Logger.log`) used for debugging on both client and server (viewable in GAS editor logs or browser console). Admin email notifications configured in `gas/config.js` might be used. `gasErrorManager` provides standardized error throwing via its `throwError` method.
   - **Coding Standards:** Modern JavaScript (`const`/`let`, arrow functions, template literals), **No `class` syntax, no `require()`, no `module.exports`, no `import`/`export` statements.** Descriptive names, JSDoc comments (for functions, params, returns), modular factory functions.
   - **Deployment:** Uses `clasp push` to sync local code (`gas/` directory) with the online GAS editor/project. Versioning/deployments managed via GAS editor UI or `clasp deploy`.
-  - **Documentation:** `README.md` covers project overview, workflow, features, goals, testing. `SETUP.md` covers initial setup.
+  - **Documentation:** `README.md` covers project overview, workflow, features, goals, testing. `SETUP.md` covers initial setup including the specific `clasp login` procedure.
 - security_notes: |
   - **Authentication Files Distinction:**
     - `~/.clasprc.json`: **Global file outside the project**, created by `clasp login`. Contains **sensitive OAuth2 refresh tokens**. Must NEVER be shared or committed.
@@ -84,12 +84,13 @@ RULE:
 
 - "**General:**"
 
-  - " - **CRITICAL for Setup Queries:** When asked about project setup (e.g., 'how to set up', 'walk me through setup', 'what are the setup steps?'), **strictly follow ONLY the steps outlined in the provided `SETUP.md` file**. 1. Identify the request is about setup. 2. Refer _only_ to the content of `SETUP.md`. 3. Present the instructions **step-by-step, sequentially**, following the major numbered sections (and sub-steps like 'a, b, c' within a section) from `SETUP.md`. 4. **Present only ONE major step or related sub-step group at a time.** For example, present all of 'Step 2: Authorize clasp (Global Login)' including sub-steps a-e, then stop. 5. **Wait for user confirmation** (e.g., "done", "okay", "next step") before presenting the subsequent major step from `SETUP.md`. 6. Do **NOT** present the entire content of `SETUP.md` at once. 7. Do **NOT** suggest manually installing tools (`clasp`, `node`, etc.) as `.idx/dev.nix` handles this. 8. Do **NOT** deviate from the specified `clasp login` (requiring the `curl` step) or the `clasp create`/`pull` procedures described in `SETUP.md`. Do **NOT** suggest alternative commands like `clasp clone` or `clasp login --no-localhost`. 9. Accurately summarize or quote the instructions for the current step from `SETUP.md`."
-  - " - Explain the _purpose_ and _reasoning_ behind suggested code changes."
+  - "When the user asks for project setup, strictly follow the instructions in `SETUP.md` sequentially. First, check if the user has enabled the Google Apps Script API, If the user says no, tell the user to enable it at `https://script.google.com/home/usersettings` and stop. If the user says yes, continue with the setup. For the clasp login step, strictly follow the instructions in `SETUP.md`. Present each step and sub-steps in order before proceeding. Only proceed to the next step after confirmation from the user."
+  - "- Explain the _purpose_ and _reasoning_ behind suggested code changes (outside of the setup flow)."
+
   - " - When adding/modifying core functionality, suggest updating relevant documentation (`README.md`)."
   - " - Focus comments in code on the _why_, not the _what_."
   - " - Acknowledge `clasp push` is needed to sync changes."
-  - " - Refer to `SETUP.md` **ONLY** for the initial one-time setup steps (`clasp login`, `clasp create`/`pull`, prerequisites, git init)."
+  - " - Refer to `SETUP.md` **ONLY** for the initial one-time setup steps when explicitly asked about setup."
   - " - Refer to `README.md` for **all other** information: project overview, configuration needs (like `gas/config.js`), ongoing development workflow (edit, push, test), architecture, features, goals, testing procedures, key concepts."
 
 - "**Apps Script / JavaScript Specific:**"

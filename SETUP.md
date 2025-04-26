@@ -9,11 +9,13 @@ Follow these steps **once** when you first create or clone this project workspac
 1.  **Google Account:** You need a standard Google Account (or Google Workspace account).
 
 2.  **Enable Apps Script API Access (User Setting):**
-    - This is the **essential** setting to allow tools like `clasp` to work with your account.
+    - **CRITICAL:** This is an **essential** setting to allow tools like `clasp` to work with your account.
     - Go to your Apps Script User Settings page:
       [https://script.google.com/home/usersettings](https://script.google.com/home/usersettings)
     - Scroll down to the "API" section.
-    - Find "Google Apps Script API" and ensure the toggle switch is turned **"On"**. If it's off, turn it on.
+    - Find "Google Apps Script API".
+    - **Ensure** the toggle switch is turned **"On"**.
+    - **IMPORTANT:** If the switch is off, turn it on. `clasp` will not function correctly if this API is not enabled.
 
 ## 1. Verify Environment & Tools
 
