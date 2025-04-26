@@ -1,0 +1,16 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# clasp credentials (VERY IMPORTANT!)
+.clasp.json
+
+# IDE / Editor directories
+.vscode/
+.idx/
+
+# OS generated files
+.DS_Store
+Thumbs.db
