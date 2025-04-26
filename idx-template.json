@@ -1,29 +1,14 @@
 {
   "name": "Google Apps Script Project (clasp)",
-  "description": "Sets up a Google Apps Script project for local development using clasp. Allows choosing between latest stable or alpha clasp version.",
+  "description": "Sets up a Google Apps Script project for local development using clasp.",
   "icon": "https://www.gstatic.com/script/apps_script_1x_24dp.png",
-  "tags": ["google", "apps script", "clasp", "serverless", "template"],
-  "files": [
-    ".idx/dev.nix",      
-    "Code.gs",          
-    ".claspignore",      
-    ".gitignore",        
-    "README.md"          
+  "tags": [
+    "google",
+    "apps script",
+    "clasp",
+    "serverless",
+    "template"
   ],
-  "params": [
-    {
-      "name": "useAlphaClasp",
-      "label": "Use clasp alpha version?",
-      "description": "Install the latest alpha pre-release version of clasp instead of the latest stable version.",
-      "type": "boolean",
-      "defaultValue": false
-    },
-    {
-      "name": "projectName",
-      "label": "Project Title",
-      "description": "Optional: Initial title if creating a new Apps Script project.",
-      "type": "string",
-      "required": false
-    }
-  ]
+  "publisher": "Jasper Duizendstra",
+  "website": "https://duizendstra.com"
 }

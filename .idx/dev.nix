@@ -12,15 +12,17 @@
   # IDX specific settings
   idx = {
     extensions = [
-      # "dbaeumer.vscode-eslint"
-      # "esbenp.prettier-vscode"
+      "dbaeumer.vscode-eslint"
+      "esbenp.prettier-vscode"
       "GitHub.vscode-pull-request-github"
     ];
     previews = { enable = false; };
 
     workspace = {
-      # Runs once when the workspace is created
-      onCreate = { };
+     onCreate = {
+        # Optional: Guide the user on the next step
+        setup-reminder = "echo 'Workspace created. Remember to run \"clasp login\". See README.md for details.' && code README.md";
+      };
 
       # Runs every time the workspace starts
       onStart = {};
